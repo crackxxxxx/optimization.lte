@@ -1,15 +1,13 @@
 #!/system/bin/sh
 
-   MODDIR=/data/adb/modules/optimize.lte
+# Пути к установленным скриптам
+SCRIPTS=("/system/bin/qos_manager.sh" "/system/bin/power_manager.sh")
 
-   # Основная функция для удаления всех изменений
-   main() {
-       # Останавливаем запущенные скрипты
-       su -c "
-           pkill -f $MODDIR/scripts/qos_manager.sh
-           pkill -f $MODDIR/scripts/power_manager.sh
-       "
-   }
+for script in "${SCRIPTS[@]}"; do
+    if [ -f "$script" ]; then
+            echo "Removing script: $script"
+                    rm "$script"
+                        fi
+                        done
 
-   # Выполнение основной функции
-   main
+                        echo "Scripts removed successfully."
