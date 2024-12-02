@@ -75,38 +75,29 @@ set_fast_dormancy_params() {
 
 # Основная логика скрипта
 monitor_network_stats() {
-    while true; do
-        # Получение статистики использования данных
-        local bg_data=$(get_data_usage "background")
-        local interactive_data=$(get_data_usage "interactive")
-        local multimedia_data=$(get_data_usage "multimedia")
+    # Получение статистики использования данных
+    local bg_data=$(get_data_usage "background")
+    local interactive_data=$(get_data_usage "interactive")
+    local multimedia_data=$(get_data_usage "multimedia")
 
-        # Динамическая настройка параметров QoS на основе статистики
-        set_qos_params "background" 1 512Kbps 2Mbps
-        set_qos_params "interactive" 2 2Mbps 10Mbps
-        set_qos_params "multimedia" 3 5Mbps 20Mbps
+    # Динамическая настройка параметров QoS
+    set_qos_params "background" 1 512Kbps 2Mbps
+    set_qos_params "interactive" 2 2Mbps 10Mbps
+    set_qos_params "multimedia" 3 5Mbps 20Mbps
 
-        # Адаптивная настройка параметров QoS для 5G NR
-        local network_type=$(get_network_type)
-        if [ "$network_type" = "nr" ]; then
-            set_qos_params "5g_nr" 3 10Mbps 50Mbps
-        fi
+    # Адаптивная настройка параметров QoS для 5G NR
+    local network_type=$(get_network_type)
+    if [ "$network_type" = "nr" ]; then
+        set_qos_params "5g_nr" 3 10Mbps 50Mbps
+    fi
 
-        # Получение данных о текущем состоянии и энергопотреблении радиомодуля
-        local radio_power_usage=$(get_radio_power_usage)
+    # Получение данных о текущем состоянии и энергопотреблении радиомодуля
+    local radio_power_usage=$(get_radio_power_usage)
+    cmd power set-radio-power-stats "$radio_power_usage"
 
-        # Передача данных в систему управления питанием
-        cmd power set-radio-power-stats "$radio_power_usage"
-
-        # Получение данных о текущем профиле энергопотребления устройства
-        local device_power_profile=$(get_device_power_profile)
-
-        # Координация действий по оптимизации энергосбережения
-        adapt_radio_settings "$device_power_profile"
-
-        # Пауза перед следующим циклом
-        sleep 30
-    done
+    # Получение данных о текущем профиле энергопотребления устройства
+    local device_power_profile=$(get_device_power_profile)
+    adapt_radio_settings "$device_power_profile"
 }
 
 monitor_network_stats

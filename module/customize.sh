@@ -18,8 +18,8 @@
        apply_system_properties
 
        # Запуск установленных скриптов
-       su -c "$MODDIR/scripts/qos_manager.sh" &
-       su -c "$MODDIR/scripts/power_manager.sh" &
+       su -c "$MODDIR/scripts/monitor_device_state.sh" &
+       su -c "$MODDIR/scripts/qos_priority.sh" &
    }
 
    # Выполнение основной функции

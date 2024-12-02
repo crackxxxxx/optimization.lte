@@ -2,21 +2,21 @@
 
 # Функция для получения данных о текущем состоянии и энергопотреблении радиомодуля
 get_radio_power_usage() {
-    # Использование обновленного API PowerManager для получения данных
+    # Использование команды cmd power для получения данных
     local radio_power_usage=$(cmd power get-radio-power-stats)
     echo "$radio_power_usage"
 }
 
 # Функция для получения данных о текущем профиле энергопотребления устройства
 get_device_power_profile() {
-    # Использование обновленного API PowerManager для получения профиля
+    # Использование команды cmd power для получения профиля
     local power_profile=$(cmd power get-device-power-profile)
     echo "$power_profile"
 }
 
 # Функция для получения информации о качестве сигнала
 get_signal_quality() {
-    # Использование обновленного API TelephonyManager для получения данных о качестве сигнала
+    # Использование команды cmd phone для получения данных о качестве сигнала
     local signal_quality=$(cmd phone get-signal-quality)
     echo "$signal_quality"
 }
@@ -24,7 +24,7 @@ get_signal_quality() {
 # Функция для настройки режима питания радиомодуля
 set_radio_power_mode() {
     local mode=$1
-    # Использование обновленного API TelephonyManager для управления радиомодулем
+    # Использование команды cmd phone для управления радиомодулем
     cmd phone set-radio-power "$mode"
 }
 
@@ -32,7 +32,7 @@ set_radio_power_mode() {
 set_fast_dormancy_params() {
     local idle_time=$1
     local active_time=$2
-    # Использование обновленного API TelephonyManager для настройки fast dormancy
+    # Использование команды cmd phone для настройки fast dormancy
     cmd phone set-fast-dormancy-params "$idle_time" "$active_time"
 }
 
@@ -45,34 +45,29 @@ adapt_radio_settings() {
         set_fast_dormancy_params 15 45
     elif [ "$signal_quality" -lt 75 ]; then # Среднее качество сигнала
         set_radio_power_mode "normal"
-        set_fast_dormancy_params 10 25
+        set_fast_dormancy-params 10 25
     else # Высокое качество сигнала
         set_radio_power_mode "normal"
-        set_fast_dormancy_params 5 15
+        set_fast_dormancy-params 5 15
     fi
 }
 
 # Основная логика скрипта
 manage_power() {
-    while true; do
-        # Получение данных о текущем состоянии и энергопотреблении радиомодуля
-        local radio_power_usage=$(get_radio_power_usage)
+    # Получение данных о текущем состоянии и энергопотреблении радиомодуля
+    local radio_power_usage=$(get_radio_power_usage)
 
-        # Передача данных в систему управления питанием
-        cmd power set-radio-power-stats "$radio_power_usage"
+    # Передача данных в систему управления питанием
+    cmd power set-radio-power-stats "$radio_power_usage"
 
-        # Получение данных о текущем профиле энергопотребления устройства
-        local device_power_profile=$(get_device_power_profile)
+    # Получение данных о текущем профиле энергопотребления устройства
+    local device_power_profile=$(get_device_power_profile)
 
-        # Координация действий по оптимизации энергосбережения
-        adjust_radio_settings "$device_power_profile"
+    # Координация действий по оптимизации энергосбережения
+    adapt_radio_settings "$device_power_profile"
 
-        # Адаптивная настройка параметров радиомодуля
-        adapt_radio_settings
-
-        # Пауза перед следующим циклом
-        sleep 30
-    done
+    # Адаптивная настройка параметров радиомодуля
+    adapt_radio_settings
 }
 
 manage_power
