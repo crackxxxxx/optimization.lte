@@ -1,5 +1,3 @@
-#!/system/bin/sh
-
 # Пути к системным файлам
 SYSTEM_PROP_FILE="/system/build.prop"
 SYSTEM_ETC_PROP_FILE="/system/etc/prop.default"
@@ -14,24 +12,22 @@ PRIORITY_CLASS_MIN=0
 # Функция для получения состояния устройства (awake, doze или sleep)
 get_device_state() {
     # Использование команды dumpsys power для получения состояния устройства
-    local power_state=$(dumpsys power | grep "mWakefulness=" | cut -d"=" -f2)
+    local power_state=$(su -c "dumpsys power | grep 'mWakefulness=' | cut -d'=' -f2")
     echo "$power_state"
 }
 
 get_battery_level() {
     # Получение текущего уровня заряда батареи
-    local battery_level=$(...)
+    local battery_level=$(su -c "dumpsys battery | grep 'level=' | cut -d'=' -f2")
     echo "$battery_level"
 }
 
 set_network_priority() {
     local priority=$1
     local priority_class=$2
-    # Установка приоритетов в файлах system.prop и prop.default
-    echo "net.qos.default_priority=$priority" >> $SYSTEM_PROP_FILE
-    echo "net.qos.default_priority=$priority" >> $SYSTEM_ETC_PROP_FILE
-    echo "net.qos.default_class=$priority_class" >> $SYSTEM_PROP_FILE
-    echo "net.qos.default_class=$priority_class" >> $SYSTEM_ETC_PROP_FILE
+    # Установка приоритетов в системные файлы с помощью команды settings
+    su -c "settings put global net_qos_default_priority '$priority'"
+    su -c "settings put global net_qos_default_class '$priority_class'"
 }
 
 optimize_network_priority() {
@@ -55,9 +51,9 @@ optimize_network_priority() {
 # Основной цикл
 while true; do
     local device_state=$(get_device_state)
-
     if [ "$device_state" = "Awake" ]; then
         optimize_network_priority
+        echo "monitor start" >> /storage/emulated/0/log.txt
         sleep 1800  # Проверка каждые 30 минут
     else
         sleep 3600  # Проверка каждый час, если устройство в Doze или Sleep

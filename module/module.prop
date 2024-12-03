@@ -1,8 +1,7 @@
 id=optimization.lte
 name=Optimization LTE
-version=1.4
-versionCode=1400
+version=1.41
+versionCode=1410
 author=crax31
 description=Этот твик направлен на достижение оптимального баланса между производительностью мобильной связи, качеством передачи данных и энергопотреблением устройства, одновременно минимизируя системную нагрузку и улучшая стабильность работы.
-uninstall=uninstall.sh
 updateJson=https://raw.githubusercontent.com/crackxxxxx/optimization.lte/main/update.json
